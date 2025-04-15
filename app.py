@@ -10,12 +10,13 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 
 load_dotenv()
 
 
-st.title("Legal AI")
+st.title("LexiForms ⚖️")
 
 
 if "history" not in st.session_state:
@@ -29,15 +30,25 @@ data = []
 
 # Add this function to generate a tenancy agreement
 def generate_tenancy_agreement(landlord_name, tenant_name, landlord_address, tenant_address, property_address, duration, start_date, monthly_rent, amount_in_words, deposit_amount, deposit_in_words, day_of_month, notice_period, witness_landlord, witness_tenant, witness_address_landlord, witness_address_tenant):
+    # Get current date information
+    today = datetime.now()
+    current_day = today.day
+    current_month = today.strftime("%B")  # Full month name
+    current_year = today.year
+    
+    # Create ordinal suffix for day (1st, 2nd, 3rd, etc.)
+    day_suffix = "th" if 11 <= current_day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(current_day % 10, "th")
+    formatted_day = f"{current_day}{day_suffix}"
+    
     return f"""
-    THIS TENANCY AGREEMENT is made on the [Day] day of [Month], [Year].
+    THIS TENANCY AGREEMENT is made on the {formatted_day} day of {current_month}, {current_year}.
     BETWEEN:
-    {landlord_name}, of {landlord_address} (hereinafter referred to as “the Landlord”)
+    {landlord_name}, of {landlord_address} (hereinafter referred to as "the Landlord")
     AND
-    {tenant_name}, of {tenant_address} (hereinafter referred to as “the Tenant”)
+    {tenant_name}, of {tenant_address} (hereinafter referred to as "the Tenant")
     IT IS AGREED AS FOLLOWS:
     1. The Property
-    The Landlord lets and the Tenant takes ALL THAT property situated at {property_address} (the “Property”).
+    The Landlord lets and the Tenant takes ALL THAT property situated at {property_address} (the "Property").
 
     2. Term
     The tenancy shall be for a period of {duration}, commencing on {start_date}.
@@ -48,7 +59,7 @@ def generate_tenancy_agreement(landlord_name, tenant_name, landlord_address, ten
     4. Security Deposit
     The Tenant shall pay a deposit of {deposit_amount} ({deposit_in_words}) Ghana Cedis, refundable at the end of the tenancy, subject to deductions.
 
-    5. Tenant’s Covenants
+    5. Tenant's Covenants
     The Tenant shall:
     - Pay rent on time
     - Maintain the property in good condition
@@ -56,10 +67,10 @@ def generate_tenancy_agreement(landlord_name, tenant_name, landlord_address, ten
     - Permit reasonable inspections
     - Not sublet without consent
 
-    6. Landlord’s Covenants
+    6. Landlord's Covenants
     The Landlord shall:
     - Guarantee quiet possession
-    - Maintain the property’s structure
+    - Maintain the property's structure
 
     7. Termination
     Either party may terminate the agreement with {notice_period} written notice.
@@ -146,11 +157,16 @@ if query and st.session_state.retriever:
 
     
     system_prompt = (
-        "You are an assistant for question-answering tasks. "
-        "Use the following pieces of retrieved context to answer "
-        "the question. If you don't know the answer, say that you "
-        "don't know. Use three sentences maximum and keep the "
-        "answer concise."
+        "You are a specialized legal assistant providing information based on legal documents. "
+        "Use the following retrieved context to answer questions about legal matters and documents. "
+        "Prioritize accuracy and clarity in your explanations. "
+        "When interpreting legal language, be precise but accessible to non-specialists. "
+        "If the answer is not clearly found in the context or requires legal advice beyond document interpretation, "
+        "clarify that you can only provide information based on the document and not legal advice. "
+        "If a question falls outside the scope of the documents or requires professional legal judgment, "
+        "recommend consulting with a qualified legal professional. "
+        "Base your responses solely on the provided context, not on general legal knowledge. "
+        "Format important terms, definitions, or clauses with appropriate emphasis when relevant. "
         "\n\n"
         "{context}"
     )
