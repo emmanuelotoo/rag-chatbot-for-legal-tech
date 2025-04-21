@@ -1,6 +1,6 @@
 Legal AI Chatbot with Tenancy Agreement Generator
 
-This project is a Streamlit-based application that combines **retrieval-augmented generation (RAG) with Google Gemini AI to answer questions based on uploaded PDF documents and generate tenancy agreements. The app is designed to assist users in legal-related tasks, such as document analysis and agreement generation.
+This project is a Streamlit-based application that combines retrieval-augmented generation (RAG) with Google Gemini AI to answer questions based on uploaded PDF documents and generate tenancy agreements. The app is designed to assist users in legal-related tasks, such as document analysis and agreement generation.
 
 
 
@@ -108,11 +108,6 @@ File Structure
 - Integrate additional legal document templates.
 
 
-
- License
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
----
 
  Acknowledgments
 - [Streamlit](https://streamlit.io/)

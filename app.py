@@ -16,7 +16,7 @@ from datetime import datetime
 load_dotenv()
 
 
-st.title("LexiForms ⚖️")
+st.title("legal-ai ⚖️")
 
 
 if "history" not in st.session_state:
