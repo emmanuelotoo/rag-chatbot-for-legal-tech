@@ -28,15 +28,12 @@ if "retriever" not in st.session_state:
 data = []  
 
 
-# Add this function to generate a tenancy agreement
 def generate_tenancy_agreement(landlord_name, tenant_name, landlord_address, tenant_address, property_address, duration, start_date, monthly_rent, amount_in_words, deposit_amount, deposit_in_words, day_of_month, notice_period, witness_landlord, witness_tenant, witness_address_landlord, witness_address_tenant):
-    # Get current date information
     today = datetime.now()
     current_day = today.day
-    current_month = today.strftime("%B")  # Full month name
+    current_month = today.strftime("%B")
     current_year = today.year
     
-    # Create ordinal suffix for day (1st, 2nd, 3rd, etc.)
     day_suffix = "th" if 11 <= current_day <= 13 else {1: "st", 2: "nd", 3: "rd"}.get(current_day % 10, "th")
     formatted_day = f"{current_day}{day_suffix}"
     
@@ -87,9 +84,6 @@ def generate_tenancy_agreement(landlord_name, tenant_name, landlord_address, ten
     Name: {witness_landlord}, Address: {witness_address_landlord}
     Name: {witness_tenant}, Address: {witness_address_tenant}
     """
-
-
-# Modify the sidebar to include an option for generating a tenancy agreement
 with st.sidebar:
     st.title("Menu:")
     option = st.radio("Choose an option:", ["Upload a PDF", "Generate Tenancy Agreement"])
@@ -134,17 +128,14 @@ with st.sidebar:
 
 
 if data:
-    
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000)
     docs = text_splitter.split_documents(data)
 
-    
     vectorstore = Chroma.from_documents(
         documents=docs, 
         embedding=GoogleGenerativeAIEmbeddings(model="models/embedding-001"),
         persist_directory="./chroma_db"
     )
-    
     
     st.session_state.retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 10})
     st.success("Done")
@@ -155,7 +146,6 @@ query = st.chat_input("Say something: ")
 if query and st.session_state.retriever:  
     st.session_state.history.append({"user": query})
 
-    
     system_prompt = (
         "You are a specialized legal assistant providing information based on legal documents. "
         "Use the following retrieved context to answer questions about legal matters and documents. "
@@ -171,7 +161,6 @@ if query and st.session_state.retriever:
         "{context}"
     )
 
-    
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_prompt),
@@ -179,17 +168,14 @@ if query and st.session_state.retriever:
         ]
     )
 
-    
     question_answer_chain = create_stuff_documents_chain(
         ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0), 
         prompt
     )
     rag_chain = create_retrieval_chain(st.session_state.retriever, question_answer_chain)
 
-    
     response = rag_chain.invoke({"input": query})
 
-    
     st.session_state.history.append({"assistant": response['answer']})
 
 
